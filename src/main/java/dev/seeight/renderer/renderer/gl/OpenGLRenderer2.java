@@ -201,7 +201,7 @@ public class OpenGLRenderer2 implements Renderer {
 
 	@Override
 	public void texRect2f(Texture texture, float x, float y, float x2, float y2) {
-		texRect2f(texture, x, y, x2, y2, 0, 0, 1, 1);
+		texRect2f(texture, x, y, x2, y2, texture.u(), texture.v(), texture.u2(), texture.v2());
 	}
 
 	@Override
