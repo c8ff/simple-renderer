@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
  * @author C8FF
  */
 @SuppressWarnings("ConstantConditions")
-public class Window {
+class Window {
 	private long window;
 
 	private int width, height;
