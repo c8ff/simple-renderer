@@ -283,6 +283,11 @@ public class OpenGLRenderer2 implements Renderer {
 	}
 
 	@Override
+	public void resetView() {
+		this.reset(this.view);
+	}
+
+	@Override
 	public void translate(float x, float y, float z) {
 		this.view.translate(x, y, z);
 	}

@@ -418,6 +418,11 @@ public class LegacyOpenGLRenderer2 implements Renderer {
 	}
 
 	@Override
+	public void resetView() {
+		GL11.glLoadIdentity();
+	}
+
+	@Override
 	public void translate(float x, float y, float z) {
 		GL11.glTranslatef(x, y, z);
 	}

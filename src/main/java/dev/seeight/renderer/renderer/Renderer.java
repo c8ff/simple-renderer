@@ -131,6 +131,11 @@ public interface Renderer {
 	void resetProjection();
 
 	/**
+	 * Resets the view matrix.
+	 */
+	void resetView();
+
+	/**
 	 * Translates the view matrix.
 	 *
 	 * @param x The X-axis translation.
