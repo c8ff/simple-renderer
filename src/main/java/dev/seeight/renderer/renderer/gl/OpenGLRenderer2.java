@@ -42,6 +42,8 @@ public class OpenGLRenderer2 implements Renderer {
 	protected GLShaderStorageBufferObject ssbo;
 	protected GLTexture pixelTexture;
 
+	protected GLProgram program;
+
 	private boolean initialized;
 
 	// Low values to 'force' setting of these values correctly via the color(float, float, float, float) method.
@@ -103,12 +105,7 @@ public class OpenGLRenderer2 implements Renderer {
 				    color = shapeColor * texture(image, TexCoords);
 				}
 				""");
-
-		this.shader.useProgram();
-		this.shader.createUniform("model");
-		this.shader.createUniform("projection");
-		this.shader.createUniform("view");
-		this.shader.createUniform("shapeColor");
+		this.useProgram(this.shader);
 
 		this.pixelTexture = new GLTexture("/assets/textures/pixel.png", true);
 
@@ -242,8 +239,7 @@ public class OpenGLRenderer2 implements Renderer {
 			this.g = (float) g;
 			this.b = (float) b;
 			this.a = (float) a;
-			this.shader.useProgram();
-			this.shader.uniform4f("shapeColor", (float) r, (float) g, (float) b, (float) a);
+			this.getProgram().uniform4f("shapeColor", (float) r, (float) g, (float) b, (float) a);
 		}
 	}
 
@@ -263,8 +259,8 @@ public class OpenGLRenderer2 implements Renderer {
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-		this.uploadMatrixUniform("projection", this.projection);
-		this.uploadMatrixUniform("view", this.view);
+		this.useDefaultProgram();
+		this.uploadProjectionAndView();
 	}
 
 	@Override
@@ -376,6 +372,26 @@ public class OpenGLRenderer2 implements Renderer {
 		}
 	}
 
+	public void useDefaultProgram() {
+		this.useProgram(this.shader);
+	}
+
+	public void uploadProjectionAndView() {
+		this.uploadMatrixUniform("projection", this.projection);
+		this.uploadMatrixUniform("view", this.view);
+	}
+
+	public void useProgram(GLProgram program) {
+		if (program != this.program) {
+			this.program = program;
+			program.useProgram();
+		}
+	}
+
+	public GLProgram getProgram() {
+		return program;
+	}
+
 	protected GLShaderStorageBufferObject getSsbo() {
 		return ssbo;
 	}
@@ -390,6 +406,6 @@ public class OpenGLRenderer2 implements Renderer {
 
 	private void uploadMatrixUniform(String name, Matrix4f matrix4f) {
 		matrix4f.get(this.matrixBuffer);
-		this.shader.uniformMatrix4fv(name, this.matrixBuffer);
+		this.getProgram().uniformMatrix4fv(name, this.matrixBuffer);
 	}
 }
