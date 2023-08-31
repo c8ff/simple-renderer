@@ -1,23 +1,25 @@
 package dev.seeight.renderer.renderer.gl.components;
 
+import dev.seeight.renderer.renderer.gl.exception.CompileErrorException;
+import dev.seeight.renderer.renderer.gl.exception.LinkException;
+import dev.seeight.renderer.renderer.gl.exception.UniformNotFoundException;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
-import java.util.HashMap;
 
-/**
- * TODO: auto setup uniforms
- */
 public class GLProgram {
-	private final HashMap<String, Integer> uniforms = new HashMap<>();
-	private int programID;
+	protected int programID;
 
 	public GLProgram() {
 
 	}
 
 	public void init(String vertexSource, String fragmentSource) {
+		if (this.isInitialized()) {
+			return;
+		}
+
 		int vertexShaderID = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
 		int fragmentShaderID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
 
@@ -58,12 +60,9 @@ public class GLProgram {
 		GL20.glUseProgram(this.programID);
 	}
 
+	@Deprecated
 	public void createUniform(String name) {
-		int uniformLocation = GL20.glGetUniformLocation(this.programID, name);
-		if (uniformLocation < 0)
-			throw new RuntimeException("Could not find uniform: " + name);
 
-		uniforms.put(name, uniformLocation);
 	}
 
 	public void uniformVec4f(String name, Vector4f vec) {
@@ -71,48 +70,76 @@ public class GLProgram {
 	}
 
 	public void uniformMatrix4fv(String name, FloatBuffer floatBuffer) {
-		GL20.glUniformMatrix4fv(uniforms.get(name), false, floatBuffer);
+		GL20.glUniformMatrix4fv(getUniformAssert(name), false, floatBuffer);
 	}
 
-	public void uniform2f(String name, float a, float b) {
-		GL20.glUniform2f(uniforms.get(name), a, b);
+	public void uniform1f(String name, float a) {
+		GL20.glUniform1f(getUniformAssert(name), a);
 	}
 
-	public void uniform3f(String name, float a, float b, float c) {
-		GL20.glUniform3f(uniforms.get(name), a, b, c);
-	}
-
-	public void uniform4f(String name, float x, float y, float z, float w) {
-		GL20.glUniform4f(uniforms.get(name), x, y, z, w);
+	public void uniform1i(String name, int a) {
+		GL20.glUniform1i(getUniformAssert(name), a);
 	}
 
 	public void uniform1fv(String name, float[] array) {
-		GL20.glUniform1fv(uniforms.get(name), array);
+		GL20.glUniform1fv(getUniformAssert(name), array);
 	}
 
-	private void debug(String str) {
+	public void uniform2f(String name, float a, float b) {
+		GL20.glUniform2f(getUniformAssert(name), a, b);
+	}
+
+	public void uniform2i(String name, int a, int b) {
+		GL20.glUniform2i(getUniformAssert(name), a, b);
+	}
+
+	public void uniform3f(String name, float a, float b, float c) {
+		GL20.glUniform3f(getUniformAssert(name), a, b, c);
+	}
+
+	public void uniform4f(String name, float x, float y, float z, float w) {
+		GL20.glUniform4f(getUniformAssert(name), x, y, z, w);
+	}
+
+	protected void debug(String str) {
 
 	}
 
-	private void checkCompileErrors(int id, String failString) {
+	protected int getUniformAssert(String name) {
+		int loc = GL20.glGetUniformLocation(this.programID, name);
+		if (loc < 0) {
+			throw new UniformNotFoundException(this.programID, name);
+		}
+
+		return loc;
+	}
+
+	protected void checkCompileErrors(int id, String failString) {
 		int info = GL20.glGetShaderi(id, GL20.GL_COMPILE_STATUS);
-		if (info != GL20.GL_TRUE) {
+		if (info == GL20.GL_FALSE) {
 			int length = GL20.glGetShaderi(id, GL20.GL_INFO_LOG_LENGTH);
-			throw new RuntimeException(failString + GL20.glGetShaderInfoLog(id, length));
+			throw new CompileErrorException(failString + GL20.glGetShaderInfoLog(id, length), id);
 		}
 	}
 
-	private void checkLinkErrors(int id) {
+	protected void checkLinkErrors(int id) {
 		int info = GL20.glGetProgrami(id, GL20.GL_LINK_STATUS);
-		if (info != GL20.GL_TRUE) {
+		if (info == GL20.GL_FALSE) {
 			int length = GL20.glGetProgrami(id, GL20.GL_INFO_LOG_LENGTH);
-			throw new RuntimeException("Error while linking shaders: " + GL20.glGetProgramInfoLog(id, length));
+			throw new LinkException(GL20.glGetProgramInfoLog(id, length), id);
 		}
 	}
 
 	public void delete() {
+		if (!isInitialized()) {
+			return;
+		}
+
 		GL20.glDeleteProgram(this.programID);
 		this.programID = 0;
-		this.uniforms.clear();
+	}
+
+	public boolean isInitialized() {
+		return this.programID != 0;
 	}
 }
