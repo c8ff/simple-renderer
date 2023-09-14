@@ -92,4 +92,8 @@ public class GLFramebuffer {
     public int getHeight() {
         return height;
     }
+
+    public boolean isCreated() {
+        return texture > 0 && fbo > 0;
+    }
 }
