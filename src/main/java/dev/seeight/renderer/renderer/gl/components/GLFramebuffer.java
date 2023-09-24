@@ -7,15 +7,35 @@ import org.lwjgl.opengl.GL30;
 import java.nio.ByteBuffer;
 
 public class GLFramebuffer {
+	/**
+	 * The main framebuffer object.
+	 */
 	protected int fbo = -1;
+	/**
+	 * The attached texture to the framebuffer object.
+	 */
 	protected int texture = -1;
+	/**
+	 * The width of the framebuffer.
+	 */
 	protected int width;
+	/**
+	 * The height of the framebuffer.
+	 */
 	protected int height;
 
 	public void create(int width, int height) {
 		create(width, height, true);
 	}
 
+	/**
+	 * Creates a new underlying framebuffer object and texture.
+	 * Deletes the old one if it existed.
+	 *
+	 * @param width       The width of the new framebuffer
+	 * @param height      The height of the new framebuffer
+	 * @param checkErrors True if {@link #checkFrameBuffer()} should be called after creating the components.
+	 */
 	public void create(int width, int height, boolean checkErrors) {
 		this.width = width;
 		this.height = height;
@@ -37,20 +57,19 @@ public class GLFramebuffer {
 		this.unbind();
 	}
 
+	/**
+	 * Deletes both the framebuffer and the attached texture.
+	 */
 	public void delete() {
-		if (this.texture > 0) {
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-			GL11.glDeleteTextures(this.texture);
-			this.texture = -1;
-		}
-
-		if (this.fbo > 0) {
-			this.unbind();
-			GL30.glDeleteFramebuffers(this.fbo);
-			this.fbo = -1;
-		}
+		this.deleteTexture();
+		this.deleteFramebuffer();
 	}
 
+	/**
+	 * Binds the {@link #fbo} object with optional viewport setting.
+	 *
+	 * @param viewport True if the viewport should be resized to the frame buffer's size.
+	 */
 	public void bind(boolean viewport) {
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fbo);
 
@@ -59,10 +78,16 @@ public class GLFramebuffer {
 		}
 	}
 
+	/**
+	 * Unbinds the current framebuffer.
+	 */
 	public void unbind() {
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 	}
 
+	/**
+	 * Creates a new texture and sets {@link #texture}.
+	 */
 	protected void createTexture() {
 		this.texture = GL11.glGenTextures();
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.texture);
@@ -73,11 +98,36 @@ public class GLFramebuffer {
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, this.width, this.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
 	}
 
+	/**
+	 * Checks for framebuffer errors from OpenGL.
+	 */
 	protected void checkFrameBuffer() {
 		int status = GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
 
 		if (status != GL30.GL_FRAMEBUFFER_COMPLETE) {
 			throw new FramebufferException(status);
+		}
+	}
+
+	/**
+	 * Deletes the attached texture.
+	 */
+	protected void deleteTexture() {
+		if (this.texture > 0) {
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+			GL11.glDeleteTextures(this.texture);
+			this.texture = -1;
+		}
+	}
+
+	/**
+	 * Deletes the framebuffer.
+	 */
+	protected void deleteFramebuffer() {
+		if (this.fbo > 0) {
+			this.unbind();
+			GL30.glDeleteFramebuffers(this.fbo);
+			this.fbo = -1;
 		}
 	}
 
