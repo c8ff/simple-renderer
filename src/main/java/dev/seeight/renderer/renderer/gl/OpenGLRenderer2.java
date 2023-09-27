@@ -34,7 +34,7 @@ public class OpenGLRenderer2 implements Renderer {
 			1, 1,
 			1, 0
 	};
-	public boolean INVERT_V_COORDINATES = false;
+	public boolean INVERT_V_COORDINATES;
 
 	protected GLProgram shader;
 	protected GLVertexBufferObject vbo;
@@ -59,6 +59,11 @@ public class OpenGLRenderer2 implements Renderer {
 	private FloatBuffer matrixBuffer;
 
 	public OpenGLRenderer2() {
+		this(false);
+	}
+
+	public OpenGLRenderer2(boolean invertV) {
+		this.INVERT_V_COORDINATES = invertV;
 		if (GLFW.glfwGetCurrentContext() != MemoryUtil.NULL) {
 			this.init();
 			this.initialized = true;
