@@ -244,7 +244,7 @@ public class OpenGLRenderer2 implements Renderer {
 			this.g = (float) g;
 			this.b = (float) b;
 			this.a = (float) a;
-			this.getProgram().uniform4f("shapeColor", (float) r, (float) g, (float) b, (float) a);
+			this.uploadColor();
 		}
 	}
 
@@ -384,6 +384,10 @@ public class OpenGLRenderer2 implements Renderer {
 	public void uploadProjectionAndView() {
 		this.uploadMatrixUniform("projection", this.projection);
 		this.uploadMatrixUniform("view", this.view);
+	}
+
+	public void uploadColor() {
+		this.getProgram().uniform4f("shapeColor", r, g, b, a);
 	}
 
 	public void useProgram(GLProgram program) {
