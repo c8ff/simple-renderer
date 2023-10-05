@@ -1,8 +1,7 @@
 package dev.seeight.renderer;
 
 import dev.seeight.renderer.renderer.Renderer;
-import dev.seeight.renderer.renderer.gl.LegacyOpenGLRenderer2;
-import dev.seeight.renderer.renderer.gl.components.GLTexture;
+import dev.seeight.renderer.renderer.gl.OpenGLRenderer2;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
@@ -23,16 +22,15 @@ public class OldMain {
 
 		GL11.glClearColor(1.0f, 1.0f, 0.0f, 0.0f);
 
-		Renderer renderer = new LegacyOpenGLRenderer2();
+		Renderer renderer = new OpenGLRenderer2();
 
-		GLTexture texture = new GLTexture("spr_heart.png");
 
 		while (!window.shouldClose()) {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
 			renderer.frameStart();
 
-			renderStuff(renderer, texture);
+			renderStuff(renderer);
 
 			renderer.frameEnd();
 
@@ -48,11 +46,7 @@ public class OldMain {
 		GLFW.glfwTerminate();
 	}
 
-	private static void renderStuff(Renderer renderer, GLTexture texture) {
-		renderer.color(1, 0, 0, 1);
-
-		renderer.texRect2d(texture, -0.5, -0.5, 0.5, 0.5);
-
+	private static void renderStuff(Renderer renderer) {
 		renderer.color(1, 1, 1, 0.5f);
 
 		for (int i = 1; i < 5; i++) {
