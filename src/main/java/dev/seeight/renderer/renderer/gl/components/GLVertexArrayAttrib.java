@@ -26,6 +26,16 @@ public class GLVertexArrayAttrib {
 		}
 	}
 
+	private GLVertexArrayAttrib(int size, int type, int sizeInBytes) {
+		if (size > 4) {
+			throw new RuntimeException("Attribute's size is outside bounds.");
+		}
+
+		this.size = size;
+		this.type = type;
+		this.sizeInBytes = sizeInBytes;
+	}
+
 	public int getSize() {
 		return size;
 	}
@@ -60,4 +70,23 @@ public class GLVertexArrayAttrib {
 			   "type=" + type + ']';
 	}
 
+	public static GLVertexArrayAttrib floatAttribute(int size) {
+		return new GLVertexArrayAttrib(size, GL11.GL_FLOAT, size * Float.BYTES);
+	}
+
+	public static GLVertexArrayAttrib intAttribute(int size) {
+		return new GLVertexArrayAttrib(size, GL11.GL_INT, size * Integer.BYTES);
+	}
+
+	public static GLVertexArrayAttrib doubleAttribute(int size) {
+		return new GLVertexArrayAttrib(size, GL11.GL_DOUBLE, size * Double.BYTES);
+	}
+
+	public static GLVertexArrayAttrib byteAttribute(int size) {
+		return new GLVertexArrayAttrib(size, GL11.GL_BYTE, size);
+	}
+
+	public static GLVertexArrayAttrib shortAttribute(int size) {
+		return new GLVertexArrayAttrib(size, GL11.GL_SHORT, size * Short.BYTES);
+	}
 }

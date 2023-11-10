@@ -9,14 +9,13 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 
 /**
- * An OpenGL renderer that uses LWJGL 3.
- * I used <a href="https://learnopengl.com">this tutorial</a> to make this renderer.
+ * An immediate mode OpenGL renderer that uses LWJGL 3.
+ * The tutorial I used was <a href="https://learnopengl.com">learnopengl.com</a> to make this renderer.
  *
  * @author seeight
  */
@@ -119,7 +118,7 @@ public class OpenGLRenderer2 implements Renderer {
 		this.vbo.init(true);
 
 		// Upload vertex data (vertex information)
-		this.vbo.bufferData(new float[]{
+		GLUtil.arrayBufferData(new float[] {
 				//x,    y,      index for UV coordinates
 				0.0f, 1.0f, 0,
 				1.0f, 0.0f, 2,
@@ -128,16 +127,10 @@ public class OpenGLRenderer2 implements Renderer {
 				0.0f, 1.0f, 6,
 				1.0f, 1.0f, 8,
 				1.0f, 0.0f, 10
-		});
+		}, GL15.GL_STATIC_DRAW);
 
 		// Create a vertex array object
-		this.vao = new GLVertexArrayObject();
-		this.vao.init(true);
-
-		// Define what is on the vertex data
-		this.vao.addAttrib(3, GL11.GL_FLOAT);
-		this.vao.uploadAttributes();
-
+		this.vao = new GLVertexArrayObject.Builder().floatAttribute(3).build();
 		GL20.glEnableVertexAttribArray(0);
 
 		// Create a shader storage buffer
@@ -146,7 +139,7 @@ public class OpenGLRenderer2 implements Renderer {
 		this.ssbo.bindBufferBase(2);
 
 		// Upload data (UV coordinates)
-		this.ssbo.bufferData(this.uvCoordinates, GL15.GL_STATIC_DRAW);
+		GLUtil.shaderStorageData(this.uvCoordinates, GL15.GL_STATIC_DRAW);
 
 		this.setUvCoordinates(0, 0, 1, 1);
 		this.color(1, 1, 1, 1);
@@ -157,8 +150,8 @@ public class OpenGLRenderer2 implements Renderer {
 		float width = Math.abs(x2 - x);
 		float height = Math.abs(y2 - y);
 
-		reset(this.model).translate(x, y, 0);
-
+		GLUtil.resetMatrix(this.model);
+		this.model.translate(x, y, 0);
 		this.model.scale(width, height, 1F);
 
 		this.uploadMatrixUniform("model", this.model);
@@ -166,9 +159,7 @@ public class OpenGLRenderer2 implements Renderer {
 
 		this.bindTexture(pixelTexture.getId());
 
-		this.getVao().bindVertexArray();
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
-		GL30.glBindVertexArray(0);
 	}
 
 	@Override
@@ -218,8 +209,8 @@ public class OpenGLRenderer2 implements Renderer {
 		float width = Math.abs(x2 - x);
 		float height = Math.abs(y2 - y);
 
-		reset(this.model).translate(x, y, 0);
-
+		GLUtil.resetMatrix(this.model);
+		this.model.translate(x, y, 0);
 		this.model.scale(width, height, 1F);
 
 		this.uploadMatrixUniform("model", this.model);
@@ -227,9 +218,7 @@ public class OpenGLRenderer2 implements Renderer {
 
 		this.bindTexture(texture.getId());
 
-		this.getVao().bindVertexArray();
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
-		GL30.glBindVertexArray(0);
 	}
 
 	@Override
@@ -266,6 +255,8 @@ public class OpenGLRenderer2 implements Renderer {
 
 		this.useDefaultProgram();
 		this.uploadProjectionAndView();
+		this.useDefaultVbo();
+		this.useDefaultVao();
 	}
 
 	@Override
@@ -275,17 +266,18 @@ public class OpenGLRenderer2 implements Renderer {
 
 	@Override
 	public void ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
-		this.reset(this.projection).ortho(left, right, bottom, top, zNear, zFar);
+		this.resetProjection();
+		this.projection.ortho(left, right, bottom, top, zNear, zFar);
 	}
 
 	@Override
 	public void resetProjection() {
-		this.reset(this.projection);
+		GLUtil.resetMatrix(this.projection);
 	}
 
 	@Override
 	public void resetView() {
-		this.reset(this.view);
+		GLUtil.resetMatrix(this.view);
 	}
 
 	@Override
@@ -373,7 +365,7 @@ public class OpenGLRenderer2 implements Renderer {
 			this.u2 = u2;
 			this.v2 = v2;
 
-			this.getSsbo().subData(0, uvCoordinates);
+			GLUtil.shaderStorageSubData(0, uvCoordinates);
 		}
 	}
 
@@ -397,20 +389,16 @@ public class OpenGLRenderer2 implements Renderer {
 		}
 	}
 
+	public void useDefaultVao() {
+		this.vao.bind();
+	}
+
+	public void useDefaultVbo() {
+		this.vbo.bind();
+	}
+
 	public GLProgram getProgram() {
 		return program;
-	}
-
-	protected GLShaderStorageBufferObject getSsbo() {
-		return ssbo;
-	}
-
-	protected GLVertexArrayObject getVao() {
-		return vao;
-	}
-
-	public Matrix4f reset(Matrix4f matrix4f) {
-		return matrix4f.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 	}
 
 	private void uploadMatrixUniform(String name, Matrix4f matrix4f) {

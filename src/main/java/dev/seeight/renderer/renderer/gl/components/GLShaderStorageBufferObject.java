@@ -16,36 +16,12 @@ public class GLShaderStorageBufferObject {
 		ssbo = GL15.glGenBuffers();
 
 		if (bind) {
-			bindBuffer();
+			bind();
 		}
 	}
 
-	public void bindBuffer() {
+	public void bind() {
 		GL15.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, ssbo);
-	}
-
-	public void bufferData(int[] data, int usage) {
-		GL15.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, data, usage);
-	}
-
-	public void bufferData(float[] data, int usage) {
-		GL15.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, data, usage);
-	}
-
-	public void bufferData(double[] data, int usage) {
-		GL15.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, data, usage);
-	}
-
-	public void subData(int offset, int[] data) {
-		GL15.glBufferSubData(GL43.GL_SHADER_STORAGE_BUFFER, offset, data);
-	}
-
-	public void subData(int offset, float[] data) {
-		GL15.glBufferSubData(GL43.GL_SHADER_STORAGE_BUFFER, offset, data);
-	}
-
-	public void subData(int offset, double[] data) {
-		GL15.glBufferSubData(GL43.GL_SHADER_STORAGE_BUFFER, offset, data);
 	}
 
 	public void bindBufferBase(int id) {

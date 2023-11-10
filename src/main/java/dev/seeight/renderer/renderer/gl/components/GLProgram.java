@@ -15,7 +15,7 @@ public class GLProgram {
 
 	}
 
-	public void init(String vertexSource, String fragmentSource) {
+	public void init(CharSequence vertexSource, CharSequence fragmentSource) {
 		if (this.isInitialized()) {
 			return;
 		}
@@ -23,19 +23,16 @@ public class GLProgram {
 		int vertexShaderID = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
 		int fragmentShaderID = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
 
-		debug("Compiling vertex shader.");
 		GL20.glShaderSource(vertexShaderID, vertexSource);
 		GL20.glCompileShader(vertexShaderID);
 
 		this.checkCompileErrors(vertexShaderID, "An error occurred while compiling the vertex shader: ");
 
-		debug("Compiling fragment shader.");
 		GL20.glShaderSource(fragmentShaderID, fragmentSource);
 		GL20.glCompileShader(fragmentShaderID);
 
 		this.checkCompileErrors(fragmentShaderID, "An error occurred while compiling the fragment shader: ");
 
-		debug("Linking shaders.");
 		this.programID = GL20.glCreateProgram();
 
 		GL20.glAttachShader(this.programID, vertexShaderID);
@@ -99,10 +96,6 @@ public class GLProgram {
 
 	public void uniform4f(String name, float x, float y, float z, float w) {
 		GL20.glUniform4f(getUniformAssert(name), x, y, z, w);
-	}
-
-	protected void debug(String str) {
-
 	}
 
 	protected int getUniformAssert(String name) {
