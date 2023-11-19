@@ -37,6 +37,10 @@ public class GLFramebuffer {
 	 * @param checkErrors True if {@link #checkFrameBuffer()} should be called after creating the components.
 	 */
 	public void create(int width, int height, boolean checkErrors) {
+		if (width == 0 && height == 0) {
+			throw new IllegalArgumentException("width and height cannot be 0.");
+		}
+
 		this.width = width;
 		this.height = height;
 
@@ -91,11 +95,18 @@ public class GLFramebuffer {
 	protected void createTexture() {
 		this.texture = GL11.glGenTextures();
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.texture);
+		this.applyTextureParameters();
+		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, this.width, this.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+	}
+
+	/**
+	 * Applies the texture's arguments.
+	 */
+	protected void applyTextureParameters() {
 		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
 		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
 		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
-		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, this.width, this.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
 	}
 
 	/**
