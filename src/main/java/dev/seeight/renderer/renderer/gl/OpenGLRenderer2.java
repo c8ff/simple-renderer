@@ -155,7 +155,6 @@ public class OpenGLRenderer2 implements Renderer {
 		this.model.scale(width, height, 1F);
 
 		this.uploadMatrixUniform("model", this.model);
-		this.uploadMatrixUniform("view", this.view);
 
 		this.bindTexture(pixelTexture.getId());
 
@@ -214,7 +213,6 @@ public class OpenGLRenderer2 implements Renderer {
 		this.model.scale(width, height, 1F);
 
 		this.uploadMatrixUniform("model", this.model);
-		this.uploadMatrixUniform("view", this.view);
 
 		this.bindTexture(texture.getId());
 
@@ -254,7 +252,6 @@ public class OpenGLRenderer2 implements Renderer {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		this.useDefaultProgram();
-		this.uploadProjectionAndView();
 		this.useDefaultVbo();
 		this.useDefaultVao();
 	}
@@ -268,41 +265,49 @@ public class OpenGLRenderer2 implements Renderer {
 	public void ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
 		this.resetProjection();
 		this.projection.ortho(left, right, bottom, top, zNear, zFar);
+		this.uploadProjectionMatrix();
 	}
 
 	@Override
 	public void resetProjection() {
 		GLUtil.resetMatrix(this.projection);
+		this.uploadProjectionMatrix();
 	}
 
 	@Override
 	public void resetView() {
 		GLUtil.resetMatrix(this.view);
+		this.uploadViewMatrix();
 	}
 
 	@Override
 	public void translate(float x, float y, float z) {
 		this.view.translate(x, y, z);
+		this.uploadViewMatrix();
 	}
 
 	@Override
 	public void scale(float x, float y, float z) {
 		this.view.scale(x, y, z);
+		this.uploadViewMatrix();
 	}
 
 	@Override
 	public void rotate(float angle, float x, float y, float z) {
 		this.view.rotate(angle, x, y, z);
+		this.uploadViewMatrix();
 	}
 
 	@Override
 	public void setViewMatrix4f(float[] array) {
 		this.view.set(array);
+		this.uploadViewMatrix();
 	}
 
 	@Override
 	public void setViewMatrix4f(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33) {
 		this.view.set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+		this.uploadViewMatrix();
 	}
 
 	@Override
@@ -323,6 +328,7 @@ public class OpenGLRenderer2 implements Renderer {
 	@Override
 	public void setProjectionMatrix4f(float[] array) {
 		this.projection.set(array);
+		this.uploadProjectionMatrix();
 	}
 
 	public void setUvCoordinates(float u, float v, float u2, float v2) {
@@ -374,7 +380,15 @@ public class OpenGLRenderer2 implements Renderer {
 	}
 
 	public void uploadProjectionAndView() {
+		this.uploadProjectionMatrix();
+		this.uploadViewMatrix();
+	}
+
+	public void uploadProjectionMatrix() {
 		this.uploadMatrixUniform("projection", this.projection);
+	}
+
+	public void uploadViewMatrix() {
 		this.uploadMatrixUniform("view", this.view);
 	}
 
