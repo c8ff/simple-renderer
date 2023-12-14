@@ -7,6 +7,7 @@ import org.joml.Vector4f;
 import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class GLProgram {
 	protected int programID;
@@ -70,16 +71,28 @@ public class GLProgram {
 		GL20.glUniformMatrix4fv(getUniformAssert(name), false, floatBuffer);
 	}
 
-	public void uniform1f(String name, float a) {
-		GL20.glUniform1f(getUniformAssert(name), a);
+	public void uniform1i(String name, int value) {
+		GL20.glUniform1i(getUniformAssert(name), value);
 	}
 
-	public void uniform1i(String name, int a) {
-		GL20.glUniform1i(getUniformAssert(name), a);
+	public void uniform1iv(String name, int[] value) {
+		GL20.glUniform1iv(getUniformAssert(name), value);
 	}
 
-	public void uniform1fv(String name, float[] array) {
-		GL20.glUniform1fv(getUniformAssert(name), array);
+	public void uniform1iv(String name, IntBuffer value) {
+		GL20.glUniform1iv(getUniformAssert(name), value);
+	}
+
+	public void uniform1f(String name, float value) {
+		GL20.glUniform1f(getUniformAssert(name), value);
+	}
+
+	public void uniform1fv(String name, float[] value) {
+		GL20.glUniform1fv(getUniformAssert(name), value);
+	}
+
+	public void uniform1fv(String name, FloatBuffer value) {
+		GL20.glUniform1fv(getUniformAssert(name), value);
 	}
 
 	public void uniform2f(String name, float a, float b) {
