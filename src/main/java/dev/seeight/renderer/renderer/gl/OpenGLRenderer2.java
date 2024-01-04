@@ -143,6 +143,8 @@ public class OpenGLRenderer2 implements Renderer {
 
 		this.setUvCoordinates(0, 0, 1, 1);
 		this.color(1, 1, 1, 1);
+
+		this.uploadViewMatrix();
 	}
 
 	@Override
