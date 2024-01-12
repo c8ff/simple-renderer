@@ -123,7 +123,7 @@ public class GLFramebuffer {
 	/**
 	 * Deletes the attached texture.
 	 */
-	protected void deleteTexture() {
+	public void deleteTexture() {
 		if (this.texture > 0) {
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 			GL11.glDeleteTextures(this.texture);
@@ -134,7 +134,7 @@ public class GLFramebuffer {
 	/**
 	 * Deletes the framebuffer.
 	 */
-	protected void deleteFramebuffer() {
+	public void deleteFramebuffer() {
 		if (this.fbo > 0) {
 			this.unbind();
 			GL30.glDeleteFramebuffers(this.fbo);
