@@ -25,7 +25,11 @@ public class GLFramebuffer {
 	protected int height;
 
 	public void create(int width, int height) {
-		create(width, height, true);
+		create(width, height, true, true);
+	}
+
+	public void create(int width, int height, boolean deletePrevious) {
+		create(width, height, deletePrevious, true);
 	}
 
 	/**
