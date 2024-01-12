@@ -36,7 +36,7 @@ public class GLFramebuffer {
 	 * @param height      The height of the new framebuffer
 	 * @param checkErrors True if {@link #checkFrameBuffer()} should be called after creating the components.
 	 */
-	public void create(int width, int height, boolean checkErrors) {
+	public void create(int width, int height, boolean deletePrevious, boolean checkErrors) {
 		if (width == 0 && height == 0) {
 			throw new IllegalArgumentException("width and height cannot be 0.");
 		}
@@ -45,7 +45,9 @@ public class GLFramebuffer {
 		this.height = height;
 
 		// delete previous framebuffer and texture, if existent.
-		this.delete();
+		if (deletePrevious) {
+			this.delete();
+		}
 		// creates a new texture with width and height
 		this.createTexture();
 		this.fbo = GL30.glGenFramebuffers();
