@@ -36,7 +36,7 @@ public class OpenGLRenderer2 implements Renderer {
 	public boolean INVERT_V_COORDINATES;
 
 	protected GLProgram shader;
-	protected GLVertexBufferObject vbo;
+	protected GLArrayBufferObject vbo;
 	protected GLVertexArrayObject vao;
 	protected GLShaderStorageBufferObject ssbo;
 	protected GLTexture pixelTexture;
@@ -114,7 +114,7 @@ public class OpenGLRenderer2 implements Renderer {
 		this.pixelTexture = new GLTexture("/assets/textures/pixel.png", true);
 
 		// Create a vertex buffer object
-		this.vbo = new GLVertexBufferObject();
+		this.vbo = new GLArrayBufferObject();
 		this.vbo.init(true);
 
 		// Upload vertex data (vertex information)
